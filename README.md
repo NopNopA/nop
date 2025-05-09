@@ -1,2 +1,0 @@
-# nopnopa.github.io
-NopNopA
