@@ -1,1 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roblox Accounts Separate</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #e3f2fd, #4fc3f7);
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2.5rem;
+        }
+        .card {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 1.5rem;
+            box-shadow: 0 6px 30px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            backdrop-filter: blur(12px);
+            transform: translateY(0);
+            animation: float 4s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .button {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        .button:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: 0.5s;
+        }
+        .button:hover:not(:disabled)::after {
+            left: 100%;
+        }
+        .button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+        .lock-icon::before {
+            content: '\1F512'; /* Unicode สำหรับไอคอนแม่กุญแจ */
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+        .page {
+            display: none;
+            animation: slideIn 0.5s ease-in-out;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        h1 {
+            background: linear-gradient(to right, #0288d1, #4fc3f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: textGlow 2s ease-in-out infinite;
+        }
+        @keyframes textGlow {
+            0%, 100% { text-shadow: 0 0 5px rgba(79, 195, 247, 0.5); }
+            50% { text-shadow: 0 0 15px rgba(79, 195, 247, 0.8); }
+        }
+        textarea {
+            resize: none;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            border-color: #0288d1;
+            box-shadow: 0 0 10px rgba(2, 136, 209, 0.3);
+        }
+        .output-box {
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .blocked {
+            color: #15803d;
+            font-weight: 500;
+        }
+        .failed {
+            color: #b91c1c;
+            font-weight: 500;
+        }
+        .pending {
+            color: #d97706;
+            font-weight: 500;
+        }
+        .summary {
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        .status-checking {
+            color: #0288d1;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .status-complete {
+            color: #15803d;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        footer {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #333;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            color: white;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.3s, transform 0.3s;
+            z-index: 1000;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .toast.success {
+            background: #22c55e;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+        .toast.error {
+            background: #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1 class="text-4xl font-bold text-center mb-10">Roblox Accounts Separate</h1>
+            <div class="flex justify-center space-x-4 mb-10">
+                <button onclick="showPage('split')" class="button bg-blue-500 text-white px-8 py-3 rounded-full font-semibold">Split Accounts</button>
+                <button onclick="showPage('replace')" class="button bg-blue-500 text-white px-8 py-3 rounded-full font-semibold">Replace Cookie</button>
+                <button id="blockButton" onclick="showPage('block')" class="button bg-blue-500 text-white px-8 py-3 rounded-full font-semibold lock-icon" disabled>Block Account</button>
+            </div>
 
+            <!-- ส่วน Split Accounts -->
+            <div id="split" class="page">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-4">Split Accounts</h2>
+                <div class="flex space-x-4 mb-4">
+                    <button onclick="pasteInput('inputData')" class="button bg-blue-600 text-white px-4 py-2 rounded-lg">Paste</button>
+                    <p class="text-gray-700 font-semibold mt-2">Lines: <span id="inputLines">0</span></p>
+                </div>
+                <textarea id="inputData" class="w-full p-4 border border-gray-300 rounded-lg mb-4" rows="6" placeholder="Enter data (Username:Password:Cookie)" oninput="processInput()"></textarea>
+                <div class="flex space-x-6">
+                    <div class="w-1/2">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-gray-700 font-semibold">Username:Password (Lines: <span id="userPassLines">0</span>)</p>
+                            <button onclick="copyText('userPassOutput')" class="button bg-blue-600 text-white px-4 py-2 rounded-lg">Copy</button>
+                        </div>
+                        <div id="userPassOutput" class="output-box text-gray-700"></div>
+                    </div>
+                    <div class="w-1/2">
+                        <div class="flex justify-between items-center mb-2">
+                            <p class="text-gray-700 font-semibold">Cookies (Lines: <span id="cookieLines">0</span>)</p>
+                            <button onclick="copyText('cookieOutput')" class="button bg-blue-600 text-white px-4 py-2 rounded-lg">Copy</button>
+                        </div>
+                        <div id="cookieOutput" class="output-box text-gray-700"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ส่วน Replace Cookie -->
+            <div id="replace" class="page">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-4">Replace Cookie</h2>
+                <div class="flex space-x-4 mb-4">
+                    <button onclick="pasteInput('replaceInputData')" class="button bg-blue-600 text-white px-4 py-2 rounded-lg">Paste Combo</button>
+                    <button onclick="pasteInput('newCookieInput')" class="button bg-blue-600 text-white px-4 py-2 rounded-lg">Paste New Cookie</button>
+                    <p class="text-gray-700 font-semibold mt-2">Combo Lines: <span id="replaceInputLines">0</span></p>
+                </div>
+                <textarea id="replaceInputData" class="w-full p-4 border border-gray-300 rounded-lg mb-4" rows="6" placeholder="Enter data (Username:Password:Cookie)" oninput="processReplaceInput()"></textarea>
+                <textarea id="newCookieInput" class="w-full p-4 border border-gray-300 rounded-lg mb-4" rows="2" placeholder="Enter new cookie" oninput="processReplaceInput()"></textarea>
+                <div class="w-full">
+                    <div class="flex justify-between items-center mb-2">
+                        <p class="text-gray-700 font-semibold">Updated Combo (Lines: <span id="replaceComboLines">0</span>)</p>
+                        <button onclick="copyText('replaceComboOutput')" class="button bg-blue-600 text-white px-4 py-2 rounded-lg">Copy</button>
+                    </div>
+                    <div id="replaceComboOutput" class="output-box text-gray-700"></div>
+                </div>
+            </div>
+
+            <!-- ส่วน Block Account -->
+            <div id="block" class="page">
+                <h2 class="text-2xl font-semibold text-blue-800 mb-4">Block Account</h2>
+                <div class="flex space-x-4 mb-4">
+                    <button onclick="pasteInput('blockInputData')" class="button bg-blue-600 text-white px-4 py-2 rounded-lg">Paste</button>
+                    <p class="text-gray-700 font-semibold mt-2">Lines: <span id="blockInputLines">0</span></p>
+                </div>
+                <textarea id="blockInputData" class="w-full p-4 border border-gray-300 rounded-lg mb-4" rows="6" placeholder="Enter data (Username:Password:Cookie or Cookie)" oninput="processBlockInput()"></textarea>
+                <p id="blockStatus" class="status-checking">Processing accounts...</p>
+                <p class="summary">Total: <span id="blockTotalCount">0</span>, Blocked: <span id="blockedCount">0</span>, Failed: <span id="failedCount">0</span></p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Identifier</th>
+                            <th>UserID</th>
+                            <th>Block Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="blockTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <footer>
+        Created by NopNopA, NopNop
+    </footer>
+    <script>
+        const Api = "https://leading-wow-animal-addressing.trycloudflare.com";
+        let blockAccountData = [];
+        let blockAttempts = 0; // ตัวนับจำนวนครั้งที่พยายามบล็อก
+        const blockLimit = 5; // จำกัดการบล็อกที่ 5 ครั้ง
+
+        function showNotification(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            if (pageId === 'block') {
+                if (blockAttempts >= blockLimit) {
+                    showNotification('Block feature is locked due to exceeding usage limit.', 'error');
+                    return;
+                }
+                document.getElementById('blockButton').disabled = true; // ล็อกปุ่ม Block Account
+                showNotification('Block feature is disabled.', 'error');
+                return;
+            }
+            document.getElementById(pageId).classList.add('active');
+            if (pageId === 'replace') {
+                processReplaceInput();
+            } else if (pageId === 'split') {
+                processInput();
+            }
+        }
+
+        async function pasteInput(inputId) {
+            try {
+                const permission = await navigator.permissions.query({ name: 'clipboard-read' });
+                if (permission.state === 'denied') {
+                    showNotification('Clipboard read permission denied.', 'error');
+                    return;
+                }
+                const text = await navigator.clipboard.readText();
+                document.getElementById(inputId).value = text;
+                if (inputId === 'inputData') {
+                    processInput();
+                } else if (inputId === 'blockInputData') {
+                    if (blockAttempts >= blockLimit) {
+                        showNotification('Block feature is locked due to exceeding usage limit.', 'error');
+                        return;
+                    }
+                    processBlockInput();
+                } else if (inputId === 'replaceInputData' || inputId === 'newCookieInput') {
+                    processReplaceInput();
+                }
+            } catch (err) {
+                console.error('Failed to paste:', err);
+                showNotification('Failed to paste from clipboard.', 'error');
+            }
+        }
+
+        async function copyText(elementId) {
+            const text = document.getElementById(elementId).textContent;
+            try {
+                const permission = await navigator.permissions.query({ name: 'clipboard-write' });
+                if (permission.state === 'denied') {
+                    showNotification('Clipboard write permission denied.', 'error');
+                    return;
+                }
+                await navigator.clipboard.writeText(text);
+                showNotification('Copied to clipboard!', 'success');
+            } catch (err) {
+                console.error('Failed to copy:', err);
+                showNotification('Failed to copy to clipboard.', 'error');
+            }
+        }
+
+        function processInput() {
+            const input = document.getElementById('inputData').value.trim();
+            const lines = input.split('\n').filter(line => line.trim() !== '');
+            document.getElementById('inputLines').textContent = lines.length;
+
+            let userPassOutput = [];
+            let cookieOutput = [];
+
+            lines.forEach(line => {
+                const parts = line.split(':');
+                if (parts.length >= 3) {
+                    const username = parts[0];
+                    const password = parts[1];
+                    const cookie = parts.slice(2).join(':');
+                    userPassOutput.push(`${username}:${password}`);
+                    cookieOutput.push(cookie);
+                }
+            });
+
+            document.getElementById('userPassOutput').textContent = userPassOutput.join('\n');
+            document.getElementById('cookieOutput').textContent = cookieOutput.join('\n');
+            document.getElementById('userPassLines').textContent = userPassOutput.length;
+            document.getElementById('cookieLines').textContent = cookieOutput.length;
+        }
+
+        function processReplaceInput() {
+            const input = document.getElementById('replaceInputData').value.trim();
+            const newCookie = document.getElementById('newCookieInput').value.trim();
+            const lines = input.split('\n').filter(line => line.trim() !== '');
+            document.getElementById('replaceInputLines').textContent = lines.length;
+
+            let comboOutput = [];
+
+            lines.forEach(line => {
+                const parts = line.split(':');
+                if (parts.length >= 3) {
+                    const username = parts[0];
+                    const password = parts[1];
+                    comboOutput.push(`${username}:${password}:${newCookie}`);
+                }
+            });
+
+            document.getElementById('replaceComboOutput').textContent = comboOutput.join('\n');
+            document.getElementById('replaceComboLines').textContent = comboOutput.length;
+        }
+
+        async function getUserID(cookie, retryOnce = true) {
+            try {
+                const response = await fetch(`${Api}/userid`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ cookie })
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+                const result = await response.json();
+                return result.userID || null;
+            } catch (error) {
+                console.error('Error fetching UserID:', error);
+                if (retryOnce) {
+                    return await getUserID(cookie, false);
+                }
+                showNotification('Failed to fetch UserID.', 'error');
+                return null;
+            }
+        }
+
+        async function blockAccount(userIDs, cookie, retryOnce = true) {
+            try {
+                const response = await fetch(`${Api}/block`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userID: userIDs, cookie })
+                });
+                if (!response.ok) {
+                    throw new Error(`HTTP error: ${response.status}`);
+                }
+                const result = await response.json();
+                return result;
+            } catch (error) {
+                console.error('Error blocking account:', error);
+                if (retryOnce) {
+                    return await blockAccount(userIDs, cookie, false);
+                }
+                showNotification('Failed to block accounts.', 'error');
+                return { data: userIDs.reduce((acc, id) => ({ ...acc, [id]: false }), {}), successful_blocks: 0, total_blocks: userIDs.length, all_successful: false };
+            }
+        }
+
+        async function processBlockInput() {
+            blockAttempts++;
+            if (blockAttempts > blockLimit) {
+                showNotification('Block feature is locked due to exceeding usage limit.', 'error');
+                document.getElementById('blockTableBody').innerHTML = '';
+                document.getElementById('blockStatus').textContent = 'Feature locked';
+                document.getElementById('blockStatus').className = 'status-checking';
+                return;
+            }
+
+            const input = document.getElementById('blockInputData').value.trim();
+            const lines = input.split('\n').filter(line => line.trim() !== '');
+            document.getElementById('blockInputLines').textContent = lines.length;
+            if (lines.length > 100) {
+                showNotification('Input exceeds 100 lines. Only the first 100 will be processed.', 'error');
+            }
+            const processedLines = lines.slice(0, 100);
+            document.getElementById('blockTotalCount').textContent = processedLines.length;
+            document.getElementById('blockedCount').textContent = '0';
+            document.getElementById('failedCount').textContent = '0';
+
+            const tableBody = document.getElementById('blockTableBody');
+            const blockStatus = document.getElementById('blockStatus');
+            tableBody.innerHTML = '';
+            blockAccountData = [];
+
+            blockStatus.textContent = 'Fetching UserIDs...';
+            blockStatus.className = 'status-checking';
+
+            processedLines.forEach((line, index) => {
+                const parts = line.split(':');
+                let identifier, cookie;
+
+                if (parts.length >= 3) {
+                    identifier = parts[0];
+                    cookie = parts.slice(2).join(':');
+                } else {
+                    identifier = `Cookie ${index + 1}`;
+                    cookie = line;
+                }
+
+                blockAccountData.push({ line, identifier, cookie, userID: null, status: 'Pending', blockResults: {} });
+
+                const row = document.createElement('tr');
+                row.id = `block-row-${index}`;
+                row.innerHTML = `
+                    <td>${identifier}</td>
+                    <td>Fetching...</td>
+                    <td class="pending">Pending</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            for (let i = 0; i < blockAccountData.length; i++) {
+                blockStatus.textContent = `Fetching UserIDs: ${i + 1}/${blockAccountData.length}`;
+                const { cookie } = blockAccountData[i];
+                const userID = await getUserID(cookie);
+                blockAccountData[i].userID = userID;
+
+                const row = document.getElementById(`block-row-${i}`);
+                row.innerHTML = `
+                    <td>${blockAccountData[i].identifier}</td>
+                    <td>${userID || 'N/A'}</td>
+                    <td class="pending">Pending</td>
+                `;
+            }
+
+            blockStatus.textContent = 'Blocking accounts...';
+            let blockedCount = 0;
+            let failedCount = 0;
+
+            for (let i = 0; i < blockAccountData.length; i++) {
+                const { userID, cookie } = blockAccountData[i];
+                let blockResults = {};
+
+                if (userID) {
+                    const targetUserIDs = blockAccountData
+                        .filter((_, j) => i !== j && blockAccountData[j].userID)
+                        .map(data => data.userID);
+                    
+                    if (targetUserIDs.length > 0) {
+                        const result = await blockAccount(targetUserIDs, cookie);
+                        blockResults = result.data;
+                    } else {
+                        blockResults = {};
+                    }
+                } else {
+                    blockResults = {};
+                }
+
+                blockAccountData[i].blockResults = blockResults;
+                const success = Object.values(blockResults).some(status => status);
+                blockAccountData[i].status = success ? 'Blocked' : 'Failed';
+
+                if (success) {
+                    blockedCount++;
+                } else {
+                    failedCount++;
+                }
+
+                const row = document.getElementById(`block-row-${i}`);
+                row.innerHTML = `
+                    <td>${blockAccountData[i].identifier}</td>
+                    <td>${blockAccountData[i].userID || 'N/A'}</td>
+                    <td class="${success ? 'blocked' : 'failed'}">${success ? 'Blocked' : 'Failed'}</td>
+                `;
+
+                if (Object.keys(blockResults).length > 0) {
+                    const detailRow = document.createElement('tr');
+                    detailRow.innerHTML = `
+                        <td colspan="3">
+                            <div class="output-box">
+                                ${Object.entries(blockResults).map(([uid, status]) => `UserID ${uid}: ${status ? 'Blocked' : 'Failed'}`).join('<br>')}
+                            </div>
+                        </td>
+                    `;
+                    tableBody.appendChild(detailRow);
+                }
+
+                document.getElementById('blockedCount').textContent = blockedCount;
+                document.getElementById('failedCount').textContent = failedCount;
+            }
+
+            blockStatus.textContent = 'Blocking complete!';
+            blockStatus.className = 'status-complete';
+        }
+    </script>
+</body>
+</html>
