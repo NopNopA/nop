@@ -372,21 +372,50 @@
 
         function processReplaceInput() {
             const input = document.getElementById('replaceInputData').value.trim();
-            const newCookie = document.getElementById('newCookieInput').value.trim();
-            const lines = input.split('\n').filter(line => line.trim() !== '');
-            document.getElementById('replaceInputLines').textContent = lines.length;
-
+            const newCookieInput = document.getElementById('newCookieInput').value.trim();
+            
+            // Split inputs into lines and filter out empty lines
+            const inputLines = input.split('\n').filter(line => line.trim() !== '');
+            const newCookieLines = newCookieInput.split('\n').filter(line => line.trim() !== '');
+            
+            // Update line count display
+            document.getElementById('replaceInputLines').textContent = inputLines.length;
+            
+            // Check if inputs are empty
+            if (!input || !newCookieInput) {
+                showNotification('Please enter both combo data and new cookies.', 'error');
+                document.getElementById('replaceComboOutput').textContent = '';
+                document.getElementById('replaceComboLines').textContent = '0';
+                return;
+            }
+            
+            // Limit processing to 100 lines to prevent performance issues
+            const maxLines = 100;
+            if (inputLines.length > maxLines) {
+                showNotification(`Input exceeds ${maxLines} lines. Only the first ${maxLines} will be processed.`, 'error');
+            }
+            const processedLines = inputLines.slice(0, maxLines);
+            
+            // Notify if there are fewer cookies than input lines
+            if (newCookieLines.length < processedLines.length) {
+                showNotification(`Only ${newCookieLines.length} new cookies provided for ${processedLines.length} input lines. Original cookies will be used for remaining lines.`, 'error');
+            }
+            
             let comboOutput = [];
-
-            lines.forEach(line => {
+            
+            // Process each line with a corresponding new cookie
+            processedLines.forEach((line, index) => {
                 const parts = line.split(':');
                 if (parts.length >= 3) {
                     const username = parts[0];
                     const password = parts[1];
+                    // Use the corresponding new cookie if available, otherwise keep the original cookie
+                    const newCookie = index < newCookieLines.length ? newCookieLines[index] : parts.slice(2).join(':');
                     comboOutput.push(`${username}:${password}:${newCookie}`);
                 }
             });
-
+            
+            // Update output and line count
             document.getElementById('replaceComboOutput').textContent = comboOutput.join('\n');
             document.getElementById('replaceComboLines').textContent = comboOutput.length;
         }
